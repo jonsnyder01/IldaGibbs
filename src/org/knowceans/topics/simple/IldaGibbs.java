@@ -197,11 +197,11 @@ public class IldaGibbs implements ISimpleGibbs, ISimpleQueryGibbs, ISimplePpx {
 		System.out.println(gs);
 		System.out.println("end test");
 
-		System.out.println("start pack topics");
-		gs.packTopics();
+		System.out.println("do not pack topics");
+		//gs.packTopics();
 
-		System.out.println(gs);
-		System.out.println("end pack topics");
+		//System.out.println(gs);
+		//System.out.println("end pack topics");
 		
 		System.out.println("start write data");
 		gs.writeData();
@@ -310,20 +310,23 @@ public class IldaGibbs implements ISimpleGibbs, ISimpleQueryGibbs, ISimplePpx {
 		
 		for (int m = 0; m < M; m++) {
 			for (int k = 0; k < K; k++) {
-				train_theta[m][k] = (nmk[m].get(k) + alpha) / (w[m].length + alpha * K);
+				int kk = kactive.get(k);
+				train_theta[m][k] = (nmk[m].get(kk) + alpha) / (w[m].length + alpha * K);
 				theta[doc_list_train.get(m)][k] = train_theta[m][k];
 			}
 		}
 		
 		for (int k = 0; k < K; k++) {
 			for (int t = 0; t < V; t++) {
-				train_phi[k][t] = (nkt.get(k)[t] + beta) / (nk.get(k) + beta * V);
+				int kk = kactive.get(k);
+				train_phi[k][t] = (nkt.get(kk)[t] + beta) / (nk.get(kk) + beta * V);
 			}
 		}
 		
 		for (int m = 0; m < Mq; m++) {
 			for (int k = 0; k < K; k++) {
-				test_theta[m][k] = (nmkq[m][k] + alpha) / (wq[m].length + alpha * K);
+				int kk = kactive.get(k);
+				test_theta[m][k] = (nmkq[m][kk] + alpha) / (wq[m].length + alpha * K);
 				theta[doc_list_test.get(m)][k] = test_theta[m][k];
 			}
 		}
@@ -741,7 +744,8 @@ public class IldaGibbs implements ISimpleGibbs, ISimpleQueryGibbs, ISimplePpx {
 					// compute weights
 					double psum = 0;
 					for (int kk = 0; kk < K; kk++) {
-						pp[kk] = (nmkq[m][kk] + alpha) * phi[kk][t];
+						k = kactive.get(kk);
+						pp[kk] = (nmkq[m][k] + alpha) * phi[k][t];
 						psum += pp[kk];
 					}
 					// sample
